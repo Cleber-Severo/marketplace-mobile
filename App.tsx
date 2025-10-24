@@ -1,4 +1,4 @@
-import { config } from '@gluestack-ui/config';
+import { config } from './config/gluestack-ui.config';
 import { GluestackUIProvider, StatusBar, Text } from '@gluestack-ui/themed';
 import {
   Karla_400Regular,
@@ -19,8 +19,7 @@ export default function App() {
         translucent
       />
 
-      {fontsLoaded ? <Loading /> : <Loading />}
-      {/* {fontsLoaded ? <Routes /> : <Loading />} */}
+      {fontsLoaded ? <Routes /> : <Loading />}
     </GluestackUIProvider>
   );
 }
