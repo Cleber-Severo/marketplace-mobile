@@ -7,6 +7,10 @@ import { Home } from '@screens/Home';
 import { MyAnnouncements } from '@screens/MyAnnouncements';
 import { TouchableOpacity } from 'react-native';
 
+function SignOutButton() {
+  return null;
+}
+
 type AppRoutes = {
   home: undefined;
   myAnnouncements: undefined;
@@ -26,9 +30,9 @@ export function AppRoutes() {
     <Navigator>
       <Screen name="home" component={Home} />
       <Screen name="myAnnouncements" component={MyAnnouncements} />
-      <Screen
+      {/* <Screen
         name="signOut"
-        component={() => null}
+        component={SignOutButton}
         options={{
           tabBarButton: props => (
             <TouchableOpacity
@@ -44,7 +48,7 @@ export function AppRoutes() {
             </TouchableOpacity>
           ),
         }}
-      />
+      /> */}
     </Navigator>
   );
 }
