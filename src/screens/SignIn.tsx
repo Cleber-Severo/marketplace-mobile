@@ -51,7 +51,7 @@ export function SignIn() {
 
             <VStack w="$full" mb="$4">
               <Input placeholder="E-mail" />
-              <Input placeholder="Senha" />
+              <Input placeholder="Senha" type="password" />
             </VStack>
 
             <Button title="Entrar" variant="primary" onPress={() => {}} />
