@@ -27,6 +27,7 @@ export function SignIn() {
             justifyContent="center"
             alignItems="center"
             mb="$16"
+            mt="$4"
           >
             <LogoLg />
 
@@ -63,7 +64,7 @@ export function SignIn() {
           alignItems="center"
           bg="$gray700"
           px="$12"
-          py="$20"
+          py="$16"
         >
           <Text mb="$4" fontSize="$sm" color="$gray200">
             Ainda não tem acesso?
