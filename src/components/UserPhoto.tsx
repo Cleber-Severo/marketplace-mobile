@@ -8,7 +8,12 @@ type Props = ComponentProps<typeof Image>;
 export function UserPhoto({ ...rest }: Props) {
   return (
     <View position="relative">
-      <Image rounded="$full" backgroundColor="$gray600" {...rest} />
+      <Image
+        rounded="$full"
+        backgroundColor="$gray600"
+        {...rest}
+        alt="profile photo placeholder"
+      />
 
       <Center
         position="absolute"
