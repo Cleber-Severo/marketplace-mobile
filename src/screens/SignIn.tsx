@@ -1,14 +1,54 @@
 import { LogoLg } from '@assets/logoLg';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
-import { Pressable, ScrollView, Text, VStack } from '@gluestack-ui/themed';
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  VStack,
+} from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
-// import LogoSvg from '@assets/logoLg.svg';
-// const Logo = LogoSvg;
+type FormData = {
+  email: string;
+  password: string;
+};
+
+const validationSchema = yup.object({
+  email: yup
+    .string()
+    .required('E-mail é obrigatório')
+    .email('E-mail inválido'),
+  password: yup
+    .string()
+    .required('Senha é obrigatória')
+    .min(6, 'Senha deve ter pelo menos 6 caracteres'),
+});
+
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    resolver: yupResolver(validationSchema),
+  });
+  console.log('🚀 ~ SignIn ~ errors:', errors);
+
+  function submitSignIn(data: FormData) {
+    console.log(data);
+  }
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -51,11 +91,39 @@ export function SignIn() {
             </Text>
 
             <VStack w="$full" mb="$4">
-              <Input placeholder="E-mail" />
-              <Input placeholder="Senha" type="password" />
+              <Controller
+                name="email"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="E-mail"
+                    errorMessage={errors.email?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="password"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="Senha"
+                    type="password"
+                    errorMessage={errors.password?.message}
+                  />
+                )}
+              />
             </VStack>
 
-            <Button title="Entrar" variant="primary" onPress={() => {}} />
+            <Button
+              title="Entrar"
+              variantCustomProp="primary"
+              onPress={handleSubmit(submitSignIn)}
+            />
           </VStack>
         </VStack>
 
