@@ -3,15 +3,14 @@ import {
   Button as GlueStackButton,
   Text,
 } from '@gluestack-ui/themed';
+import { ComponentProps } from 'react';
 
 type ButtonVariant = 'default' | 'primary' | 'dark';
 
-type Props = {
+type Props = ComponentProps<typeof GlueStackButton> & {
   title: string;
-  variant?: ButtonVariant;
+  variantCustomProp?: ButtonVariant;
   isLoading?: boolean;
-  onPress?: () => void;
-  disabled?: boolean;
 };
 
 type VariantStyle = {
@@ -36,19 +35,21 @@ const variantStyles: Record<ButtonVariant, VariantStyle> = {
     activeBg: '$gray200',
     textColor: '$gray700',
   },
-} as const;
+};
 
 export function Button({
   title,
   isLoading = false,
-  variant = 'default' as ButtonVariant,
+  variantCustomProp = 'default',
   onPress,
   disabled,
+  ...rest
 }: Props) {
-  const styles = variantStyles[variant];
+  const styles = variantStyles[variantCustomProp];
 
   return (
     <GlueStackButton
+      {...rest}
       w="$full"
       h="$12"
       px="$4"
@@ -63,7 +64,11 @@ export function Button({
       {isLoading ? (
         <ButtonSpinner />
       ) : (
-        <Text color={styles.textColor} fontFamily="$heading" fontSize={'$sm'}>
+        <Text
+          color={styles.textColor}
+          fontFamily="$heading"
+          fontSize={'$sm'}
+        >
           {title}
         </Text>
       )}
