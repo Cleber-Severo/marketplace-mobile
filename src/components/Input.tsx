@@ -4,6 +4,7 @@ import {
   Input as GlueStackInput,
   FormControlError,
   FormControlErrorText,
+  Text,
 } from '@gluestack-ui/themed';
 import { ComponentProps, useState } from 'react';
 
@@ -35,7 +36,7 @@ export function Input({
   const invalid = isInvalid || !!errorMessage;
 
   return (
-    <FormControl isInvalid={isInvalid} w="$full" mb="$4">
+    <FormControl isInvalid={invalid} w="$full" mb="$4">
       <GlueStackInput
         isInvalid={invalid}
         h="$12"
