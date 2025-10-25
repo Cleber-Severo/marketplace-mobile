@@ -5,10 +5,14 @@ import {
   Pressable,
   ScrollView,
   Text,
+  useToast,
   VStack,
 } from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
+
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 import { Controller, useForm } from 'react-hook-form';
 
@@ -17,6 +21,7 @@ import { TouchableOpacity } from 'react-native';
 import { UserPhoto } from '@components/UserPhoto';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { ToastMessage } from '@components/ToastMessage';
 
 type FormData = {
   name: string;
@@ -24,10 +29,12 @@ type FormData = {
   phone: string;
   password: string;
   confirmPassword: string;
+  avatar: string;
 };
 
 const validationSchema = yup.object({
   name: yup.string().required('Nome é obrigatório'),
+  avatar: yup.string().required('Foto é obrigatória'),
   email: yup
     .string()
     .required('E-mail é obrigatório')
@@ -49,6 +56,7 @@ export function SignUp() {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -57,9 +65,100 @@ export function SignUp() {
       phone: '',
       password: '',
       confirmPassword: '',
+      avatar: '',
     },
     resolver: yupResolver(validationSchema),
   });
+  console.log('🚀 ~ SignUp ~ errors:', errors);
+
+  const toast = useToast();
+
+  async function handleUserPhotoSelect() {
+    console.log('Inside image picker');
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync(
+        {
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 1,
+          aspect: [4, 4],
+          allowsEditing: true,
+        }
+      );
+
+      if (photoSelected.canceled) {
+        return;
+      }
+
+      const photoUri = photoSelected.assets[0].uri;
+
+      setValue('avatar', photoUri);
+
+      // console.log('🚀 ~ handleUserPhotoSelect ~ photoUri:', photoUri);
+      // if (photoUri) {
+      //   const photoInfo = (await FileSystem.getInfoAsync(
+      //     photoUri
+      //   )) as { size: number };
+
+      //   console.log(
+      //     '🚀 ~ handleUserPhotoSelect ~ photoInfo.size:',
+      //     photoInfo.size / 1024 / 1024
+      //   );
+      //   if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
+      //     return toast.show({
+      //       placement: 'top',
+      //       render: ({ id }) => (
+      //         <ToastMessage
+      //           id={id}
+      //           action="error"
+      //           title="Essa imagem é muito grande. Escolha uma de até 5MB."
+      //           onClose={() => toast.close(id)}
+      //         />
+      //       ),
+      //     });
+      //   }
+
+      //   const fileExtension = photoUri.split('.').pop();
+
+      // const photoFile = {
+      //   name: `${user.name}.${fileExtension}`.toLowerCase(),
+      //   uri: photoUri,
+      //   type: `${photoSelected.assets[0].type}/${fileExtension}`,
+      // } as any;
+
+      // const userPhotoUploadForm = new FormData();
+      // userPhotoUploadForm.append('avatar', photoFile);
+
+      // const avatarUpdatedResponse = await api.patch(
+      //   '/users/avatar',
+      //   userPhotoUploadForm,
+      //   {
+      //     headers: {
+      //       'Content-Type': 'multipart/form-data',
+      //     },
+      //   }
+      // );
+
+      // const userUpdated = user;
+      // userUpdated.avatar = avatarUpdatedResponse.data.avatar;
+
+      // updateUserProfile(userUpdated);
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            action="success"
+            title="Foto atualizada com sucesso!"
+            onClose={() => toast.close(id)}
+          />
+        ),
+      });
+      // }
+    } catch (error) {
+      console.log('🚀 ~ handleUserPhotoSelect ~ error:', error);
+    }
+  }
 
   function submitSignUp(data: FormData) {
     console.log(data);
@@ -106,7 +205,7 @@ export function SignUp() {
         </VStack>
 
         <VStack w="$full" px="$12" alignItems="center">
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleUserPhotoSelect}>
             <UserPhoto source={defautAvatar} />
           </TouchableOpacity>
           <VStack w="$full" mb="$2" mt="$3">
