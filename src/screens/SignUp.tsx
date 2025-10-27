@@ -22,8 +22,9 @@ import { UserPhoto } from '@components/UserPhoto';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ToastMessage } from '@components/ToastMessage';
+import { api } from '@services/api';
 
-type FormData = {
+type SignUpFormData = {
   name: string;
   email: string;
   phone: string;
@@ -58,7 +59,7 @@ export function SignUp() {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<SignUpFormData>({
     defaultValues: {
       name: '',
       email: '',
@@ -91,77 +92,46 @@ export function SignUp() {
 
       const photoUri = photoSelected.assets[0].uri;
 
-      setValue('avatar', photoUri);
+      if (photoUri) {
+        const photoInfo = (await FileSystem.getInfoAsync(
+          photoUri
+        )) as { size: number };
 
-      // console.log('🚀 ~ handleUserPhotoSelect ~ photoUri:', photoUri);
-      // if (photoUri) {
-      //   const photoInfo = (await FileSystem.getInfoAsync(
-      //     photoUri
-      //   )) as { size: number };
+        const fileExtension = photoUri.split('.').pop();
 
-      //   console.log(
-      //     '🚀 ~ handleUserPhotoSelect ~ photoInfo.size:',
-      //     photoInfo.size / 1024 / 1024
-      //   );
-      //   if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
-      //     return toast.show({
-      //       placement: 'top',
-      //       render: ({ id }) => (
-      //         <ToastMessage
-      //           id={id}
-      //           action="error"
-      //           title="Essa imagem é muito grande. Escolha uma de até 5MB."
-      //           onClose={() => toast.close(id)}
-      //         />
-      //       ),
-      //     });
-      //   }
+        const photoFile = {
+          name: `profileImage_${Date.now()}.${fileExtension}`.toLowerCase(),
+          uri: photoUri,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+        } as any;
 
-      //   const fileExtension = photoUri.split('.').pop();
+        const photoFilePayload = JSON.stringify(photoFile);
 
-      // const photoFile = {
-      //   name: `${user.name}.${fileExtension}`.toLowerCase(),
-      //   uri: photoUri,
-      //   type: `${photoSelected.assets[0].type}/${fileExtension}`,
-      // } as any;
-
-      // const userPhotoUploadForm = new FormData();
-      // userPhotoUploadForm.append('avatar', photoFile);
-
-      // const avatarUpdatedResponse = await api.patch(
-      //   '/users/avatar',
-      //   userPhotoUploadForm,
-      //   {
-      //     headers: {
-      //       'Content-Type': 'multipart/form-data',
-      //     },
-      //   }
-      // );
-
-      // const userUpdated = user;
-      // userUpdated.avatar = avatarUpdatedResponse.data.avatar;
-
-      // updateUserProfile(userUpdated);
-
-      toast.show({
-        placement: 'top',
-        render: ({ id }) => (
-          <ToastMessage
-            id={id}
-            action="success"
-            title="Foto atualizada com sucesso!"
-            onClose={() => toast.close(id)}
-          />
-        ),
-      });
-      // }
+        setValue('avatar', photoFilePayload);
+      }
     } catch (error) {
       console.log('🚀 ~ handleUserPhotoSelect ~ error:', error);
     }
   }
 
-  function submitSignUp(data: FormData) {
-    console.log(data);
+  async function submitSignUp(data: SignUpFormData) {
+    try {
+      const userPhoto = JSON.parse(data.avatar);
+      const formData = new FormData();
+      formData.append('avatar', userPhoto);
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      formData.append('tel', data.phone);
+      formData.append('password', data.password);
+
+      await api.post('/users', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } catch (error) {
+      console.log('Error:', error);
+    }
   }
 
   return (
@@ -175,6 +145,7 @@ export function SignUp() {
         alignItems="center"
         borderRadius="$3xl"
         bg="$gray600"
+        pb="$3"
       >
         <VStack
           width="$64"
@@ -208,6 +179,11 @@ export function SignUp() {
           <TouchableOpacity onPress={handleUserPhotoSelect}>
             <UserPhoto source={defautAvatar} />
           </TouchableOpacity>
+
+          <Text color="$red500" size="sm">
+            {errors.avatar?.message}
+          </Text>
+
           <VStack w="$full" mb="$2" mt="$3">
             <Controller
               name="name"
