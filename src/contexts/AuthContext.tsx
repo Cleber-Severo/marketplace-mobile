@@ -5,6 +5,7 @@ import { createContext, useState } from 'react';
 export type AuthContextDataProps = {
   user: UserDTO;
   signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
   isLoadingUserStorageData: boolean;
 };
 
@@ -25,10 +26,14 @@ export function AuthContextProvider({ children }: AuthContextProps) {
     try {
       setIsLoadingUserStorageData(true);
 
+      console.log('🚀 ~ signIn ~ email, password:', email, password);
+
       const { data } = await api.post('/sessions', {
         email,
         password,
       });
+
+      console.log('🚀 ~ signIn ~ data:', data);
 
       setUser(data.user);
 
@@ -41,9 +46,19 @@ export function AuthContextProvider({ children }: AuthContextProps) {
     }
   }
 
+  async function signOut() {
+    try {
+      setIsLoadingUserStorageData(true);
+      setUser({} as UserDTO);
+    } catch (error) {
+    } finally {
+      setIsLoadingUserStorageData(false);
+    }
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, signIn, isLoadingUserStorageData }}
+      value={{ user, signIn, signOut, isLoadingUserStorageData }}
     >
       {children}
     </AuthContext.Provider>

@@ -46,7 +46,6 @@ export function SignIn() {
     },
     resolver: yupResolver(validationSchema),
   });
-  console.log('🚀 ~ SignIn ~ errors:', errors);
 
   async function submitSignIn(data: FormData) {
     await signIn(data.email, data.password);
