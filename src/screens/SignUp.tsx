@@ -2,7 +2,6 @@ import { LogoLg } from '@assets/logoLg';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import {
-  Pressable,
   ScrollView,
   Text,
   useToast,
@@ -21,7 +20,6 @@ import { TouchableOpacity } from 'react-native';
 import { UserPhoto } from '@components/UserPhoto';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ToastMessage } from '@components/ToastMessage';
 import { api } from '@services/api';
 
 type SignUpFormData = {
@@ -177,7 +175,7 @@ export function SignUp() {
 
         <VStack w="$full" px="$12" alignItems="center">
           <TouchableOpacity onPress={handleUserPhotoSelect}>
-            <UserPhoto source={defautAvatar} />
+            <UserPhoto source={defautAvatar} isEdit />
           </TouchableOpacity>
 
           <Text color="$red500" size="sm">
